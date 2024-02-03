@@ -84,7 +84,6 @@
             method: "GET",
             url: "http://127.0.0.1:3000/resolve/" + domain,
             onload: function(response) {
-
             }
         });
     }
@@ -117,7 +116,7 @@
         var currentTime = new Date().getTime();
         return GM.getValue(domain).then(lastSentTimestamp => {
             if (lastSentTimestamp) {
-                var timeDifference = currentTime - parseInt(lastSentTimestamp));
+                var timeDifference = currentTime - parseInt(lastSentTimestamp);
                 return timeDifference < 600000;
             }
             return false;
@@ -147,7 +146,7 @@
             keys.forEach(key => {
                 GM.deleteValue(key);
             });
-            console.log("Log cleared.");
+            console.log("Log cleared successfully.");
         });
     }
 
