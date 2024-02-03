@@ -1,13 +1,19 @@
 // ==UserScript==
 // @name         Hosts Logger
 // @namespace    -
-// @version      0.1
+// @version      0.2
 // @description  Send every domain queried on the webpage to http://127.0.0.1:3000/resolve/<domain>, with a 10-minute cooldown period. Includes a context menu button to clear the log immediately.
 // @author       Cat-Ling
 // @homepageURL  https://github.com/Cat-Ling
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=nodejs.org
 // @match        *://xvideos.com/*
 // @match        *://*.xvideos.com/*
+// @match        *://xvideos.red/*
+// @match        *://*.xvideos.red/*
+// @match        *://xvcams.com/*
+// @match        *://*.xvcams.com/*
+// @match        *://xvcamsblog.com/*
+// @match        *://*.xvcamsblog.com/*
 // @match        *://xvideos2.com/*
 // @match        *://*.xvideos2.com/*
 // @match        *://xvideos5.com/*
@@ -89,13 +95,15 @@
     }
 
     function extractDomainsFromHTML(html) {
-        var regex = /(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*/gi;
+        var regex = /(?:https?|ftp):\/\/([^\/\s$?#]+)\b/gi;
         var matches = html.match(regex);
         var domains = new Set();
         if (matches) {
             matches.forEach(function(url) {
                 var domain = extractDomain(url);
-                domains.add(domain);
+                if (isValidDomain(domain)) {
+                    domains.add(domain);
+                }
             });
         }
         return Array.from(domains);
@@ -103,13 +111,17 @@
 
     function extractDomain(url) {
         var domain;
-        if (url.indexOf("://") > -1) {
-            domain = url.split('/')[2];
-        } else {
-            domain = url.split('/')[0];
+        var match = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/);
+        if (match) {
+            domain = match[1];
         }
-        domain = domain.split(':')[0];
         return domain;
+    }
+
+    function isValidDomain(domain) {
+        // Check if the domain contains any invalid characters
+        var invalidCharsRegex = /[^a-zA-Z0-9\.\-]/;
+        return !invalidCharsRegex.test(domain);
     }
 
     function isDomainOnCooldown(domain) {
